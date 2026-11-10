@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prahari AI | Digital Safety Scanner</title>
+<style>
+:root{--bg:#08111f;--panel:#101d30;--line:#243650;--text:#eef5ff;--muted:#9eb0c8;--cyan:#57d6d0;--red:#ff647c;--amber:#ffc36b;--green:#6de0a5}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#173451 0,transparent 35%),var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,Arial}
+.wrap{max-width:1050px;margin:auto;padding:28px 20px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:44px}.brand{font-weight:800;font-size:21px;letter-spacing:.3px}.brand span{color:var(--cyan)}.tag{border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--muted);font-size:12px}
+.hero{max-width:720px;margin-bottom:28px}.eyebrow{color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase}.hero h1{font-size:clamp(34px,6vw,56px);line-height:1.05;margin:12px 0}.hero p,.muted{color:var(--muted)}.layout{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:linear-gradient(145deg,#12233a,#0d192a);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 45px #0003}.tabs{display:flex;gap:8px;margin:15px 0}.tab,button,select{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:#152740;color:var(--text);cursor:pointer}.tab.active{background:#16434c;border-color:#287d7d;color:#aafff6}textarea,input{width:100%;background:#091525;border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--text);font:inherit;outline:none}textarea{min-height:170px;resize:vertical}textarea:focus,input:focus{border-color:var(--cyan)}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:13px}.primary{background:var(--cyan);color:#06202a;border:0;font-weight:800}.secondary{background:transparent}.small{font-size:12px;color:var(--muted)}.result{margin-top:18px;display:none}.risk{font-size:28px;font-weight:800}.pill{display:inline-block;border-radius:99px;padding:5px 10px;font-size:12px;font-weight:800}.high{background:#512332;color:#ff9cad}.medium{background:#4c391e;color:#ffd18b}.low{background:#173e32;color:#91f1bf}.reason{padding:10px 0;border-bottom:1px solid var(--line);color:#d7e4f5}.scorebar{height:9px;background:#23354b;border-radius:20px;overflow:hidden;margin:12px 0}.scorebar div{height:100%;width:0;background:var(--amber);transition:width .3s}.sample{display:block;width:100%;text-align:left;margin:9px 0;background:#0b192a}.sample b{display:block;color:var(--cyan);font-size:13px}.notice{border-left:3px solid var(--amber);padding:10px 12px;background:#302719;color:#ffdfad;border-radius:6px;font-size:13px;margin-top:18px}.side h3{margin-top:0}.feature{padding:12px 0;border-bottom:1px solid var(--line)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.top{margin-bottom:30px}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><div class="brand">🛡️ Prahari <span>AI</span></div><div class="tag">HERHACK 2026 · DEMO MVP</div></header>
+<section class="hero"><div class="eyebrow">Think before you click</div><h1>Spot suspicious messages.<br><span style="color:var(--cyan)">Stay one step safer.</span></h1><p>Check a message or web address for common warning signs. Get a transparent explanation and safer next steps.</p></section>
+<div class="layout"><main class="card">
+<h2 style="margin:0">Scan an input</h2><p class="muted" style="margin:5px 0">Paste text from an SMS, email or chat, or switch to URL mode.</p>
+<div class="tabs"><button class="tab active" id="msgTab" onclick="setMode('message')">Message scan</button><button class="tab" id="urlTab" onclick="setMode('url')">URL scan</button></div>
+<textarea id="input" placeholder="Paste a message here. Do not include passwords, OTPs or private account details."></textarea>
+<div class="actions"><button class="primary" onclick="scan()">Analyse input</button><button class="secondary" onclick="clearAll()">Clear</button></div>
+<div id="result" class="result card" style="padding:18px">
+<div class="small">ASSESSMENT · DEMONSTRATION ONLY</div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div class="risk" id="risk">Medium risk</div><span id="pill" class="pill medium">REVIEW</span></div>
+<div class="scorebar"><div id="bar"></div></div><div class="small" id="score"></div><h3>Why it was flagged</h3><div id="reasons"></div><h3>Safer next steps</h3><div id="tips" class="muted"></div>
+</div>
+<div class="notice">This prototype uses transparent heuristic rules, not a trained AI model or antivirus engine. A low-risk result does not prove that something is safe.</div>
+</main>
+<aside class="card side"><h3>Try these safe test samples</h3><p class="muted small">Synthetic examples only. Click one to load it into the scanner.</p>
+<button class="sample" onclick="loadSample(0)"><b>HIGH · Fake urgency</b>Your bank account will be blocked today. Verify immediately at http://secure-bank-login.example.test</button>
+<button class="sample" onclick="loadSample(1)"><b>HIGH · Prize lure</b>Congratulations! You won a free prize. Pay a small processing fee now to claim it.</button>
+<button class="sample" onclick="loadSample(2)"><b>MEDIUM · Unexpected attachment</b>Please review the attached invoice urgently. I was not expecting an invoice from this sender.</button>
+<button class="sample" onclick="loadSample(3)"><b>LOW · Ordinary message</b>Hi, our study group meeting is at 4 pm in the library. Please bring your notebook.</button>
+<button class="sample" onclick="loadSample(4)"><b>URL · Lookalike / risky wording</b>http://paypal-account-verify.example.test/login</button>
+<div class="feature"><b>What it checks</b><div class="muted small">Urgency, credential requests, prize/payment lures, suspicious URL patterns and insecure HTTP.</div></div>
+<div class="feature"><b>Privacy-first demo</b><div class="muted small">Analysis runs in your browser. Inputs are not uploaded or saved.</div></div>
+</aside></div>
+<footer>Prahari AI · Educational prototype · Always verify through an organisation's official app or website.</footer>
+</div>
+<script>
+let mode='message';
+const samples=[
+'Your bank account will be blocked today. Verify immediately at http://secure-bank-login.example.test',
+'Congratulations! You won a free prize. Pay a small processing fee now to claim it.',
+'Please review the attached invoice urgently. I was not expecting an invoice from this sender.',
+'Hi, our study group meeting is at 4 pm in the library. Please bring your notebook.',
+'http://paypal-account-verify.example.test/login'];
+function setMode(m){mode=m;document.getElementById('msgTab').classList.toggle('active',m==='message');document.getElementById('urlTab').classList.toggle('active',m==='url');document.getElementById('input').placeholder=m==='url'?'Paste a website address to inspect (do not open it).':'Paste a message here. Do not include passwords, OTPs or private account details.'}
+function loadSample(i){setMode(i===4?'url':'message');document.getElementById('input').value=samples[i];document.getElementById('result').style.display='none'}
+function clearAll(){document.getElementById('input').value='';document.getElementById('result').style.display='none'}
+function scan(){
+ const s=document.getElementById('input').value.trim();if(!s){alert('Please enter a message or URL first.');return}
+ let points=0,reasons=[];
+ const checks=[
+  [/urgent|immediately|within \d+ (minute|hour)|today|act now|blocked|suspend/i,2,'Urgent or threatening language may pressure someone into acting quickly.'],
+  [/otp|password|passcode|pin|cvv|bank details|verify your account|login details/i,3,'The input appears to request sensitive account or authentication information.'],
+  [/won|winner|prize|free gift|claim now|processing fee/i,2,'Unexpected prizes or fees can be used as bait.'],
+  [/click here|tap here|open this link|verify now/i,1,'It encourages clicking or taking an immediate online action.'],
+  [/http:\/\//i,1,'The URL uses HTTP rather than encrypted HTTPS. This alone does not prove fraud.'],
+  [/(bit\.ly|tinyurl\.com|t\.co|goo\.gl)/i,1,'A shortened link hides the final destination. Check it independently before visiting.'],
+  [/[a-z0-9-]+\.(example\.test|invalid)(\/|$)/i,2,'The sample uses a reserved test domain; it is not a real service.']
+ ];
+ if(mode==='url'){
+  if(!/^https?:\/\//i.test(s))reasons.push('The input does not begin with a recognised http:// or https:// URL.'); 
+  if(/@|xn--|secure|verify|login|account|bank/i.test(s)){points+=2;reasons.push('The address contains wording or formatting often used in deceptive lookalike links. Inspect the actual registered domain carefully.')}
+  if(/^http:\/\//i.test(s)){points++;reasons.push('The address uses unencrypted HTTP.')}
+  if(/(bit\.ly|tinyurl\.com|t\.co)/i.test(s)){points++;reasons.push('Shortened links conceal their destination.')}
+  if(!reasons.length)reasons.push('No obvious pattern from this small demo rule set was detected. This is not proof of safety.');
+ } else {
+  for(const [rx,p,msg] of checks){if(rx.test(s)){points+=p;reasons.push(msg)}}
+  if(!reasons.length)reasons.push('No obvious warning pattern from this small demo rule set was detected. Context and sender identity still matter.');
+ }
+ const level=points>=4?'High':points>=2?'Medium':'Low';const pct=Math.min(100,Math.round(points/7*100));
+ document.getElementById('risk').textContent=level+' risk';document.getElementById('pill').textContent=level==='High'?'CAUTION':level==='Medium'?'REVIEW':'LOW SIGNAL';document.getElementById('pill').className='pill '+level.toLowerCase();document.getElementById('bar').style.width=pct+'%';document.getElementById('bar').style.background=level==='High'?'var(--red)':level==='Medium'?'var(--amber)':'var(--green)';document.getElementById('score').textContent='Illustrative indicator score: '+points+' · '+pct+'% of demo scale (not a probability of fraud).';
+ document.getElementById('reasons').innerHTML=reasons.map(x=>'<div class="reason">• '+escapeHtml(x)+'</div>').join('');
+ document.getElementById('tips').textContent=level==='High'?'Do not click the link or send money/details. Contact the organisation using its official app, website or a phone number you already trust.':level==='Medium'?'Pause and verify the sender through a separate trusted channel. Avoid opening unexpected attachments or links.':'Still check the sender and context. Never share an OTP, password or payment PIN.';
+ document.getElementById('result').style.display='block';
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+</script></body></html>
